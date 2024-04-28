@@ -13,11 +13,14 @@ import * as bcrypt from 'bcryptjs';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interfaces/jwt-payload';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    private jwtService: JwtService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -56,7 +59,7 @@ export class UserService {
 
     return {
       user: logged,
-      token: 'ABC123',
+      token: this.getJWT({ id: user.id }),
     };
   }
 
@@ -74,5 +77,10 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  getJWT(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 }
