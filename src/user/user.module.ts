@@ -5,8 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './entities/user.entity';
 
 @Module({
-  controllers: [UserController],
-  providers: [UserService],
   imports: [
     MongooseModule.forFeature([
       {
@@ -15,5 +13,7 @@ import { User, UserSchema } from './entities/user.entity';
       },
     ]),
   ],
+  controllers: [UserController],
+  providers: [UserService],
 })
 export class UserModule {}
