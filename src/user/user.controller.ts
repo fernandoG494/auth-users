@@ -3,17 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterUser } from './dto/register-user.dto';
 import { AuthGuard } from './guards/auth.guard';
+import { User } from './entities/user.entity';
+import { LoginResponse } from './interfaces/login-response';
 
 @Controller('user')
 export class UserController {
@@ -36,22 +35,33 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Request() req: Request) {
+    const user = req['user'];
+    return user;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @UseGuards(AuthGuard)
+  @Get('check-token')
+  checkToken(@Request() req: Request): LoginResponse {
+    const user = req['user'] as User;
+    return {
+      user,
+      token: this.userService.getJWT({ id: user._id }),
+    };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.userService.findOne(+id);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.userService.update(+id, updateUserDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.userService.remove(+id);
+  // }
 }

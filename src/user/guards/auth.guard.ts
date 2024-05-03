@@ -6,10 +6,14 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../interfaces/jwt-payload';
+import { UserService } from '../user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private userService: UserService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -19,11 +23,21 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('No hay token en la petición');
     }
 
-    const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-      secret: process.env.JWT_SEED,
-    });
+    try {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: process.env.JWT_SEED,
+      });
 
-    return Promise.resolve(true);
+      const user = await this.userService.findUserById(payload.id);
+      if (!user) throw new UnauthorizedException('User dont exists');
+      if (!user.isActive) throw new UnauthorizedException('User is not active');
+
+      request['auser'] = user;
+    } catch (error) {
+      throw new UnauthorizedException('Autentiquese de nuevo');
+    }
+
+    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
