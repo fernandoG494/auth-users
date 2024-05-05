@@ -80,8 +80,10 @@ export class UserService {
     return rest;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.userModel.findById(id);
+    const { password, ...rest } = user.toJSON();
+    return rest;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
