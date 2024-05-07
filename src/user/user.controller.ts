@@ -9,14 +9,13 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
+
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
-import { RegisterUser } from './dto/register-user.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { User } from './entities/user.entity';
 import { LoginResponse } from './interfaces/login-response';
-import { UpdateUserDto } from './dto/update-user.dto';
+
+import { CreateUserDto, LoginDto, RegisterUser, UpdateUserDto } from './dto';
 
 @Controller('user')
 export class UserController {

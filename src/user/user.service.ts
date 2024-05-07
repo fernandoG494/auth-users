@@ -1,24 +1,19 @@
-import { LoginDto } from './dto/login.dto';
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { JwtService } from '@nestjs/jwt';
 
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 
 import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './interfaces/jwt-payload';
-import { LoginResponse } from './interfaces/login-response';
-import { RegisterUser } from './dto/register-user.dto';
+import { CreateUserDto, LoginDto, RegisterUser, UpdateUserDto } from './dto';
+import { JwtPayload, LoginResponse } from './interfaces';
 
 @Injectable()
 export class UserService {
