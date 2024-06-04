@@ -21,6 +21,13 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Creates a new user.
+   * @param createUserDto - Data transfer object for creating a user.
+   * @returns The created user without the password field.
+   * @throws BadRequestException if the user already exists.
+   * @throws InternalServerErrorException if an error occurs during user creation.
+   */
   async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
     const { password, ...userData } = createUserDto;
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -42,11 +49,22 @@ export class UserService {
     }
   }
 
+  /**
+   * Registers a new user and returns a login response.
+   * @param registerDto - Data transfer object for user registration.
+   * @returns The registered user and a JWT token.
+   */
   async register(registerDto: RegisterUser): Promise<LoginResponse> {
     const user = await this.create(registerDto);
     return { user, token: this.getJWT({ id: user._id }) };
   }
 
+  /**
+   * Logs in a user and returns a login response.
+   * @param loginDto - Data transfer object for user login.
+   * @returns The logged-in user and a JWT token.
+   * @throws UnauthorizedException if the credentials are invalid.
+   */
   async login(loginDto: LoginDto): Promise<LoginResponse> {
     const { email, password } = loginDto;
     const user = await this.userModel.findOne({ email });
@@ -59,10 +77,20 @@ export class UserService {
     return { user: logged, token: this.getJWT({ id: user._id }) };
   }
 
+  /**
+   * Retrieves all users.
+   * @returns An array of all users.
+   */
   findAll(): Promise<User[]> {
     return this.userModel.find().exec();
   }
 
+  /**
+   * Retrieves a user by ID.
+   * @param id - The ID of the user to retrieve.
+   * @returns The user without the password field.
+   * @throws NotFoundException if the user is not found.
+   */
   async findUserById(id: string): Promise<Omit<User, 'password'>> {
     const user = await this.userModel.findById(id).exec();
     if (!user) throw new NotFoundException('User not found');
@@ -71,6 +99,13 @@ export class UserService {
     return rest;
   }
 
+  /**
+   * Updates a user by ID.
+   * @param id - The ID of the user to update.
+   * @param updateUserDto - Data transfer object for updating a user.
+   * @returns A message indicating that the user was updated.
+   * @throws NotFoundException if the user is not found.
+   */
   async update(id: string, updateUserDto: UpdateUserDto): Promise<string> {
     const user = await this.userModel
       .findByIdAndUpdate(id, updateUserDto, {
@@ -82,12 +117,23 @@ export class UserService {
     return `User ${user.name} updated`;
   }
 
+  /**
+   * Deletes a user by ID.
+   * @param id - The ID of the user to delete.
+   * @returns A message indicating that the user was removed.
+   * @throws NotFoundException if the user is not found.
+   */
   async remove(id: string): Promise<string> {
     const result = await this.userModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException('User not found');
     return `User ${result.name} removed`;
   }
 
+  /**
+   * Generates a JWT token.
+   * @param payload - The JWT payload.
+   * @returns The generated JWT token.
+   */
   public getJWT(payload: JwtPayload): string {
     return this.jwtService.sign(payload);
   }
