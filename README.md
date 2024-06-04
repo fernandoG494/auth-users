@@ -43,6 +43,9 @@ npm install
 npm run start:dev
 ```
 
+**Optional**
+You can review Swagger on this URL `http://localhost:3000/api`
+
 **Database Verification**
 
 We recommend using [TablePlus](https://tableplus.com/) to visually inspect and manage your database content.
