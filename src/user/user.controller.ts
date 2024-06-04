@@ -9,13 +9,19 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
-
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { AuthGuard } from './guards/auth.guard';
 import { LoginResponse } from './interfaces/login-response';
 import { CreateUserDto, LoginDto, RegisterUser, UpdateUserDto } from './dto';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -26,6 +32,12 @@ export class UserController {
    * @returns The created user without the password field.
    */
   @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
   async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<Omit<User, 'password'>> {
@@ -38,6 +50,9 @@ export class UserController {
    * @returns The logged-in user and a JWT token.
    */
   @Post('/login')
+  @ApiOperation({ summary: 'Login a user' })
+  @ApiResponse({ status: 200, description: 'User logged in successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
     return this.userService.login(loginDto);
   }
@@ -48,6 +63,9 @@ export class UserController {
    * @returns The registered user and a JWT token.
    */
   @Post('/register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 201, description: 'User registered successfully.' })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
   async register(@Body() registerDto: RegisterUser): Promise<LoginResponse> {
     return this.userService.register(registerDto);
   }
@@ -58,7 +76,10 @@ export class UserController {
    * @returns An array of all users.
    */
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Get()
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'Return all users.' })
   async findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
@@ -70,7 +91,10 @@ export class UserController {
    * @returns The user and a new JWT token.
    */
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Get('check-token')
+  @ApiOperation({ summary: 'Check if token is valid' })
+  @ApiResponse({ status: 200, description: 'Token is valid.' })
   checkToken(@Request() req: Request): LoginResponse {
     const user = req['auser'] as User;
     return {
@@ -85,6 +109,9 @@ export class UserController {
    * @returns The user without the password field.
    */
   @Get(':id')
+  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiResponse({ status: 200, description: 'Return a user.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   async findOne(@Param('id') id: string): Promise<Omit<User, 'password'>> {
     return this.userService.findUserById(id);
   }
@@ -96,6 +123,9 @@ export class UserController {
    * @returns A message indicating that the user was updated.
    */
   @Patch(':id')
+  @ApiOperation({ summary: 'Update a user' })
+  @ApiResponse({ status: 200, description: 'User updated successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -110,7 +140,11 @@ export class UserController {
    * @returns A message indicating that the user was deleted.
    */
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   async remove(@Param('id') id: string): Promise<string> {
     return this.userService.remove(id);
   }
