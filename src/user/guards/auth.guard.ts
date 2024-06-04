@@ -5,14 +5,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../interfaces/jwt-payload';
+
 import { UserService } from '../user.service';
+import { JwtPayload } from '../interfaces/jwt-payload';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtService: JwtService,
-    private userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -20,28 +21,42 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('No hay token en la petición');
+      throw new UnauthorizedException('No token provided');
     }
 
-    try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: process.env.JWT_SEED,
-      });
+    const payload = await this.validateToken(token);
+    const user = await this.validateUser(payload);
 
-      const user = await this.userService.findUserById(payload.id);
-      if (!user) throw new UnauthorizedException('User dont exists');
-      if (!user.isActive) throw new UnauthorizedException('User is not active');
-
-      request['auser'] = user;
-    } catch (error) {
-      throw new UnauthorizedException('Autentiquese de nuevo');
-    }
-
+    request['auser'] = user;
     return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers['authorization']?.split(' ') ?? [];
+    const authHeader = request.headers['authorization'];
+    if (!authHeader) return undefined;
+
+    const [type, token] = authHeader.split(' ');
     return type === 'Bearer' ? token : undefined;
+  }
+
+  private async validateToken(token: string): Promise<JwtPayload> {
+    try {
+      return await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: process.env.JWT_SEED,
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  private async validateUser(payload: JwtPayload) {
+    const user = await this.userService.findUserById(payload.id);
+    if (!user) {
+      throw new UnauthorizedException('User does not exist');
+    }
+    if (!user.isActive) {
+      throw new UnauthorizedException('User is not active');
+    }
+    return user;
   }
 }
