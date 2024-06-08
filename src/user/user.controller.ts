@@ -15,11 +15,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { AuthGuard } from './guards/auth.guard';
-import { LoginResponse } from './interfaces/login-response';
 import { CreateUserDto, LoginDto, RegisterUser, UpdateUserDto } from './dto';
+import { JwtVerificationResponse, LoginResponse } from './interfaces/responses';
 
 @ApiTags('user')
 @Controller('user')
@@ -50,7 +51,7 @@ export class UserController {
    * @param loginDto - Data transfer object for user login.
    * @returns The logged-in user and a JWT token.
    */
-  @Post('/login')
+  @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
@@ -64,7 +65,7 @@ export class UserController {
    * @param registerDto - Data transfer object for user registration.
    * @returns The registered user and a JWT token.
    */
-  @Post('/register')
+  @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
@@ -99,11 +100,19 @@ export class UserController {
   @Get('check-token')
   @ApiOperation({ summary: 'Check if token is valid' })
   @ApiResponse({ status: 200, description: 'Token is valid.' })
-  checkToken(@Request() req: Request): LoginResponse {
+  checkToken(@Request() req: Request): JwtVerificationResponse {
     const user = req['auser'] as User;
+    if (user.isActive) {
+      return {
+        status: 200,
+        message: 'Token is valid',
+        error: null,
+      };
+    }
     return {
-      user,
-      token: this.userService.getJWT({ id: user._id }),
+      status: 401,
+      message: 'Invalid or expired token',
+      error: 'Unauthorized',
     };
   }
 
@@ -112,7 +121,7 @@ export class UserController {
    * @param id - The ID of the user to retrieve.
    * @returns The user without the password field.
    */
-  @Get('/:id')
+  @Get(':id')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({ status: 200, description: 'Return a user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
@@ -127,7 +136,7 @@ export class UserController {
    * @param updateUserDto - Data transfer object for updating a user.
    * @returns A message indicating that the user was updated.
    */
-  @Patch('/:id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })

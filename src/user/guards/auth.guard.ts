@@ -42,28 +42,12 @@ export class AuthGuard implements CanActivate {
    * @param request - The incoming HTTP request.
    * @returns The JWT token if present, otherwise undefined.
    */
-  private extractTokenFromHeader(request: Request): string | undefined {
+  private extractTokenFromHeader(request: any): string | undefined {
     const authHeader = request.headers['authorization'];
     if (!authHeader) return undefined;
 
     const [type, token] = authHeader.split(' ');
     return type === 'Bearer' ? token : undefined;
-  }
-
-  /**
-   * Validates the JWT token.
-   * @param token - The JWT token to validate.
-   * @returns The decoded JWT payload.
-   * @throws UnauthorizedException if the token is invalid or expired.
-   */
-  private async validateToken(token: string): Promise<JwtPayload> {
-    try {
-      return await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: process.env.JWT_SEED,
-      });
-    } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
   }
 
   /**
@@ -81,5 +65,21 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('User is not active');
     }
     return user;
+  }
+
+  /**
+   * Validates the JWT token.
+   * @param token - The JWT token to validate.
+   * @returns The decoded JWT payload.
+   * @throws UnauthorizedException if the token is invalid or expired.
+   */
+  private async validateToken(token: string): Promise<JwtPayload> {
+    try {
+      return await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: process.env.JWT_SEED,
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 }

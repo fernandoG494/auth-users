@@ -142,4 +142,18 @@ export class UserService {
   public getJWT(payload: JwtPayload): string {
     return this.jwtService.sign(payload);
   }
+
+  async verifyToken(token: string): Promise<LoginResponse> {
+    try {
+      const decoded = this.jwtService.verify<JwtPayload>(token);
+      const user = await this.userModel.findById(decoded.id).exec();
+      if (!user) {
+        throw new UnauthorizedException('Invalid token');
+      }
+      const { password, ...userData } = user.toJSON();
+      return { user: userData, token };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
 }
