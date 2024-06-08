@@ -28,7 +28,7 @@ export class UserService {
    * @throws BadRequestException if the user already exists.
    * @throws InternalServerErrorException if an error occurs during user creation.
    */
-  async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
+  async create(createUserDto: CreateUserDto): Promise<any> {
     const { password, ...userData } = createUserDto;
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -40,8 +40,13 @@ export class UserService {
     try {
       await newUser.save();
       const { password, ...user } = newUser.toJSON();
-      return user;
+      return {
+        status: 'success',
+        message: 'User created successfully',
+        user,
+      };
     } catch (error) {
+      console.log(error);
       if (error.code === 11000) {
         throw new BadRequestException(`${createUserDto.name} already exists`);
       }

@@ -41,6 +41,7 @@ export class UserController {
   async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<Omit<User, 'password'>> {
+    console.log('POST /user');
     return this.userService.create(createUserDto);
   }
 
@@ -54,6 +55,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
+    console.log('POST /user/login');
     return this.userService.login(loginDto);
   }
 
@@ -67,6 +69,7 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User registered successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   async register(@Body() registerDto: RegisterUser): Promise<LoginResponse> {
+    console.log('POST /user/register');
     return this.userService.register(registerDto);
   }
 
@@ -81,6 +84,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users.' })
   async findAll(): Promise<User[]> {
+    console.log('GET /user');
     return this.userService.findAll();
   }
 
@@ -108,11 +112,12 @@ export class UserController {
    * @param id - The ID of the user to retrieve.
    * @returns The user without the password field.
    */
-  @Get(':id')
+  @Get('/:id')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({ status: 200, description: 'Return a user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async findOne(@Param('id') id: string): Promise<Omit<User, 'password'>> {
+    console.log('GET /user/:id');
     return this.userService.findUserById(id);
   }
 
@@ -122,7 +127,7 @@ export class UserController {
    * @param updateUserDto - Data transfer object for updating a user.
    * @returns A message indicating that the user was updated.
    */
-  @Patch(':id')
+  @Patch('/:id')
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
@@ -130,6 +135,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<string> {
+    console.log('PATCH /user/:id');
     return this.userService.update(id, updateUserDto);
   }
 
@@ -146,6 +152,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User deleted successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async remove(@Param('id') id: string): Promise<string> {
+    console.log('DELETE /user/:id');
     return this.userService.remove(id);
   }
 }
