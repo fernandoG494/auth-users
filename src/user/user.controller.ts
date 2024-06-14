@@ -75,21 +75,6 @@ export class UserController {
   }
 
   /**
-   * Retrieves all users.
-   * This route is protected and requires a valid JWT token.
-   * @returns An array of all users.
-   */
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Return all users.' })
-  async findAll(): Promise<User[]> {
-    console.log('GET /user');
-    return this.userService.findAll();
-  }
-
-  /**
    * Checks the validity of the JWT token.
    * This route is protected and requires a valid JWT token.
    * @param req - The request object containing the user data.
@@ -114,6 +99,21 @@ export class UserController {
       message: 'Invalid or expired token',
       error: 'Unauthorized',
     };
+  }
+
+  /**
+   * Retrieves all users.
+   * This route is protected and requires a valid JWT token.
+   * @returns An array of all users.
+   */
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Get()
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'Return all users.' })
+  async findAll(): Promise<User[]> {
+    console.log('GET /user');
+    return this.userService.findAll();
   }
 
   /**
