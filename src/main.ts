@@ -1,13 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { AppModule } from './app.module';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const { FRONT_END_URI, FRONT_END_PORT } = process.env;
+
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:4200',
+    origin: `${FRONT_END_URI}:${FRONT_END_PORT}`,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };

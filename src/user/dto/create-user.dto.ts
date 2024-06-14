@@ -1,5 +1,5 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
 /**
  * Data Transfer Object (DTO) for creating a new user.
@@ -20,6 +20,14 @@ export class CreateUserDto {
   @ApiProperty({ description: 'The name of the user' })
   @IsString()
   name: string;
+
+  /**
+   * The last name of the user.
+   * This field must be a string.
+   */
+  @ApiProperty({ description: 'The last name of the user' })
+  @IsString()
+  lastName: string;
 
   /**
    * The password of the user.

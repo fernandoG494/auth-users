@@ -32,6 +32,13 @@ export class User {
   name: string;
 
   /**
+   * The last name of the user.
+   * This field is required.
+   */
+  @Prop({ required: true })
+  lastName: string;
+
+  /**
    * The password of the user.
    * This field is required and must be at least 6 characters long.
    */

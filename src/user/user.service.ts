@@ -119,7 +119,7 @@ export class UserService {
       .exec();
 
     if (!user) throw new NotFoundException('User not found');
-    return `User ${user.name} updated`;
+    return `User ${user.name} ${user.lastName} updated`;
   }
 
   /**
@@ -129,9 +129,9 @@ export class UserService {
    * @throws NotFoundException if the user is not found.
    */
   async remove(id: string): Promise<string> {
-    const result = await this.userModel.findByIdAndDelete(id).exec();
-    if (!result) throw new NotFoundException('User not found');
-    return `User ${result.name} removed`;
+    const user = await this.userModel.findByIdAndDelete(id).exec();
+    if (!user) throw new NotFoundException('User not found');
+    return `User ${user.name} ${user.lastName} removed`;
   }
 
   /**

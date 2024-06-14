@@ -1,7 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+
 import { CreateUserDto } from './create-user.dto';
 import { IsEmail, IsString, MinLength } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Data Transfer Object (DTO) for updating a user.
@@ -23,6 +24,14 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiPropertyOptional({ description: 'The name of the user' })
   @IsString()
   name: string;
+
+  /**
+   * The name of the user.
+   * This field must be a string.
+   */
+  @ApiPropertyOptional({ description: 'The last name of the user' })
+  @IsString()
+  lastNameame: string;
 
   /**
    * The password of the user.
