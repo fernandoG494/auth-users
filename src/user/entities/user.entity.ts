@@ -1,10 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 /**
  * Represents a User entity in the application.
  */
-@Schema()
-export class User {
+@Schema({ timestamps: true }) // Esto habilita los campos de timestamps en el esquema
+export class User extends Document {
   /**
    * The unique identifier of the user.
    */
@@ -51,6 +52,32 @@ export class User {
    */
   @Prop({ type: [String], default: ['user'] })
   roles: string[];
+
+  /**
+   * The date the user was created.
+   * Managed automatically by Mongoose.
+   */
+  createdAt?: Date;
+
+  /**
+   * The date the user was last modified.
+   * Managed automatically by Mongoose.
+   */
+  updatedAt?: Date;
+
+  /**
+   * The company the user belongs to.
+   * Default value is an empty string.
+   */
+  @Prop({ default: '' })
+  company: string;
+
+  /**
+   * The profile image of the user.
+   * Default value is an empty string.
+   */
+  @Prop({ default: '' })
+  profileImage: string;
 }
 
 /**

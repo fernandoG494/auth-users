@@ -1,8 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 
 import { CreateUserDto } from './create-user.dto';
-import { IsEmail, IsString, MinLength } from 'class-validator';
 
 /**
  * Data Transfer Object (DTO) for updating a user.
@@ -15,7 +15,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
    */
   @ApiPropertyOptional({ description: 'The email address of the user' })
   @IsEmail()
-  email: string;
+  email?: string;
 
   /**
    * The name of the user.
@@ -23,15 +23,15 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
    */
   @ApiPropertyOptional({ description: 'The name of the user' })
   @IsString()
-  name: string;
+  name?: string;
 
   /**
-   * The name of the user.
+   * The last name of the user.
    * This field must be a string.
    */
   @ApiPropertyOptional({ description: 'The last name of the user' })
   @IsString()
-  lastNameame: string;
+  lastName?: string;
 
   /**
    * The password of the user.
@@ -43,4 +43,28 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   })
   @MinLength(6)
   password?: string;
+
+  /**
+   * The company the user belongs to.
+   * This field is optional.
+   */
+  @ApiPropertyOptional({
+    description: 'The company the user belongs to',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  company?: string;
+
+  /**
+   * The profile image of the user.
+   * This field is optional.
+   */
+  @ApiPropertyOptional({
+    description: 'The profile image of the user',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
 }

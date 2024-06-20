@@ -19,6 +19,7 @@ import {
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
 import { AuthGuard } from './guards/auth.guard';
+import { OwnUser } from './guards/ownUser.guard';
 import { CreateUserDto, LoginDto, RegisterUser, UpdateUserDto } from './dto';
 import { JwtVerificationResponse, LoginResponse } from './interfaces/responses';
 
@@ -117,6 +118,26 @@ export class UserController {
   }
 
   /**
+   * Retrieves the authenticated user's information.
+   * This route is protected and requires a valid JWT token.
+   * @param req - The request object containing the user data.
+   * @returns The authenticated user's information.
+   */
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @Get('me')
+  @ApiOperation({ summary: 'Get authenticated user information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return authenticated user information.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async getMe(@Request() req: any): Promise<Omit<User, 'password'>> {
+    const user = req['auser'] as User;
+    return this.userService.findUserById(user._id);
+  }
+
+  /**
    * Retrieves a user by ID.
    * @param id - The ID of the user to retrieve.
    * @returns The user without the password field.
@@ -137,6 +158,8 @@ export class UserController {
    * @returns A message indicating that the user was updated.
    */
   @Patch(':id')
+  @UseGuards(AuthGuard, OwnUser)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })

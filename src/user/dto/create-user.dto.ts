@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 
 /**
  * Data Transfer Object (DTO) for creating a new user.
@@ -36,4 +36,28 @@ export class CreateUserDto {
   @ApiProperty({ description: 'The password of the user', minLength: 6 })
   @MinLength(6)
   password: string;
+
+  /**
+   * The company the user belongs to.
+   * This field is optional.
+   */
+  @ApiProperty({
+    description: 'The company the user belongs to',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  company?: string;
+
+  /**
+   * The profile image of the user.
+   * This field is optional.
+   */
+  @ApiProperty({
+    description: 'The profile image of the user',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  profileImage?: string;
 }
