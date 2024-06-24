@@ -67,4 +67,17 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsString()
   profileImage?: string;
+
+  /**
+   * The user's position.
+   * This value is optional
+   * Default value is an empty string.
+   */
+  @ApiPropertyOptional({
+    description: "The user's position",
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  position?: string;
 }

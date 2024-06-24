@@ -78,6 +78,14 @@ export class User extends Document {
    */
   @Prop({ default: '' })
   profileImage: string;
+
+  /**
+   * The user's position.
+   * This value is optional
+   * Default value is an empty string.
+   */
+  @Prop({ default: '' })
+  position?: string;
 }
 
 /**
