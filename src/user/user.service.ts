@@ -61,7 +61,7 @@ export class UserService {
    */
   async register(registerDto: RegisterUser): Promise<LoginResponse> {
     const user = await this.create(registerDto);
-    return { user, token: this.getJWT({ id: user._id }) };
+    return { status: 'success', user, token: this.getJWT({ id: user._id }) };
   }
 
   /**
@@ -72,6 +72,7 @@ export class UserService {
    */
   async login(loginDto: LoginDto): Promise<LoginResponse> {
     const { email, password } = loginDto;
+    console.log(loginDto);
     const user = await this.userModel.findOne({ email });
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -79,7 +80,11 @@ export class UserService {
     }
 
     const { password: _, ...logged } = user.toJSON();
-    return { user: logged, token: this.getJWT({ id: user._id }) };
+    return {
+      status: 'success',
+      user: logged,
+      token: this.getJWT({ id: user._id }),
+    };
   }
 
   /**
@@ -158,7 +163,7 @@ export class UserService {
         throw new UnauthorizedException('Invalid token');
       }
       const { password, ...userData } = user.toJSON();
-      return { user: userData, token };
+      return { status: 'success', user: userData, token };
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }

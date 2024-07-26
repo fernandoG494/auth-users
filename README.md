@@ -31,6 +31,12 @@ docker-compose up -d
 - Create a copy of `.env.template` and rename it to `.env.`
 - Edit `.env` to define the required environment variables according to the instructions provided in the file.
 
+**MONGO_URI example:**
+
+```bash
+MONGO_URI=mongodb://[Backend URI]:[PORT]/[DB name]
+```
+
 **4. Install Dependencies:**
 
 ```bash
